@@ -10,8 +10,11 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns bidi.bidi
+  #+cljs (:require-macros [cljs.core.match.macros :refer [match]])
   (:require [clojure.walk :refer (postwalk)]
-            [cemerick.url :refer (url-encode url-decode)]))
+            [cemerick.url :refer (url-encode url-decode)]
+            #+cljs [cljs.core.match]
+            #+clj [clojure.core.match :refer (match)]))
 
 ;; --------------------------------------------------------------------------------
 ;; 1 & 2 Make it work and make it right
@@ -299,7 +302,7 @@
   (resolve-handler [this m] (succeed this m))
   (unresolve-handler [this m] (when (= this (:handler m)) ""))
 
-  #+clj Fn
+  #+clj clojure.lang.Fn
   #+cljs #_Fn
   (resolve-handler [this m] (succeed this m))
   (unresolve-handler [this m] (when (= this (:handler m)) "")))
@@ -336,9 +339,10 @@
                          (f)
                          token))) path)))
 
-(defn path-with-query-for
+(comment
+  (defn path-with-query-for
   "Like path-for, but extra parameters will be appended to the url as query parameters
-   rather than silently ignored"
+  rather than silently ignored"
   [route handler & {:as all-params}]
   (let [{:keys [path params]} (path-and-params route handler all-params)
         path (reduce (fn [url token]
@@ -347,7 +351,7 @@
                                   token))) path)
         query-params (not-empty (into (sorted-map) (apply dissoc all-params (keys params))))]
     (apply str path (when query-params
-                      ["?" (form-encode query-params)]))))
+                      ["?" (form-encode query-params)])))))
 
 ;; --------------------------------------------------------------------------------
 ;; 3. Make it fast

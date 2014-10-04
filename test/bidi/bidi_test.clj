@@ -12,6 +12,7 @@
 (ns bidi.bidi-test
   (:require [clojure.test :refer :all]
             [bidi.bidi :refer :all]
+            [bidi.ring :refer :all]
             [ring.mock.request :refer :all]))
 
 (deftest matching-routes-test

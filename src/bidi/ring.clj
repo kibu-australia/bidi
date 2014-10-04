@@ -14,8 +14,7 @@
             [clojure.java.io :as io]
             [ring.util.response :refer (file-response url-response)]
             [ring.middleware.content-type :refer (wrap-content-type)]
-            [ring.middleware.file-info :refer (wrap-file-info)]
-            [ring.util.codec :refer (form-encode)]))
+            [ring.middleware.file-info :refer (wrap-file-info)]))
 
 (defn make-handler
   "Create a Ring handler from the route definition data
