@@ -10,7 +10,7 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns bidi.ring
-  (:require [bidi.bidi :as bidi]
+  (:require [bidi.bidi :as bidi :refer :all]
             [clojure.java.io :as io]
             [ring.util.response :refer (file-response url-response)]
             [ring.middleware.content-type :refer (wrap-content-type)]

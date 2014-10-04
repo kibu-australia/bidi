@@ -136,17 +136,17 @@
                                   {})))]]})
 
   #+clj clojure.lang.Fn
-  #+cljs #_IFn
+  #+cljs cljs.core.IFn
   (segment-regex-group [this]
     (condp = this
      keyword "[A-Za-z]+[A-Za-z0-9\\*\\+\\!\\-\\_\\?\\.]*(?:%2F[A-Za-z]+[A-Za-z0-9\\*\\+\\!\\-\\_\\?\\.]*)?"
      long "-?\\d{1,19}"
-     :otherwise (throw (ex-info (str "Unidentified function qualifier to pattern segment: %s" this) {}))))
+     :otherwise (throw (ex-info (str "Unidentified function qualifier to pattern segment: " this) {}))))
   (transform-param [this]
     (condp = this
       ;; keyword is close, but must be applied to a decoded string, to work with namespaced keywords
       keyword (comp keyword url-decode)
-      long #+clj #(Long/parseLong %) #+cljs #()
+      long #+clj #(Long/parseLong %) #+cljs #(js/Number %)
       (throw (ex-info (str "Unrecognized function " this) {}))))
   (matches? [this s]
     (condp = this
@@ -293,9 +293,8 @@
   (unresolve-handler [this m] (when (= this (:handler m)) ""))
 
   #+clj clojure.lang.Var
-  #+clj #_var
-  (resolve-handler [this m] (succeed this m))
-  (unresolve-handler [this m] (when (= this (:handler m)) ""))
+  #+clj (resolve-handler [this m] (succeed this m))
+  #+clj (unresolve-handler [this m] (when (= this (:handler m)) ""))
 
   #+clj clojure.lang.Keyword
   #+cljs cljs.core.Keyword
@@ -303,7 +302,7 @@
   (unresolve-handler [this m] (when (= this (:handler m)) ""))
 
   #+clj clojure.lang.Fn
-  #+cljs #_Fn
+  #+cljs cljs.core.IFn
   (resolve-handler [this m] (succeed this m))
   (unresolve-handler [this m] (when (= this (:handler m)) "")))
 
