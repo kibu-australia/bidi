@@ -53,8 +53,6 @@
   :lein-release {:deploy-via :shell
                  :shell ["lein" "deploy"]}
 
-  :auto-clean false
-
   :source-paths ["target/generated/src/clj" "src"]
 
   :resource-paths ["target/generated/src/cljs"]
@@ -62,16 +60,11 @@
   :test-paths ["target/generated/test/clj" "test"]
 
   :cljsbuild {:test-commands {"unit" ["phantomjs" :runner
-                                      "this.literal_js_was_evaluated=true"
+                                      "window.literal_js_was_evaluated=true"
                                       "target/unit-test.js"]}
               :builds
-              {:dev {:source-paths ["src/clj" "target/generated/src/cljs"]
-                     :compiler {:output-to "target/main.js"
-                                :optimizations :whitespace
-                                :pretty-print true}}
-               :test {:source-paths ["src/clj" "test/clj"
+              {:test {:source-paths ["src" "test"
                                      "target/generated/src/cljs"
                                      "target/generated/test/cljs"]
                       :compiler {:output-to "target/unit-test.js"
-                                 :optimizations :whitespace
-                                 :pretty-print true}}}})
+                                 :optimizations :advanced}}}})

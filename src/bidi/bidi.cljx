@@ -11,10 +11,12 @@
 
 (ns bidi.bidi
   #+cljs (:require-macros [cljs.core.match.macros :refer [match]])
-  (:require [clojure.walk :refer (postwalk)]
-            [cemerick.url :refer (url-encode url-decode)]
+  (:require [clojure.walk :as walk :refer [postwalk]]
+            [cemerick.url :as url :refer [url-encode url-decode]]
             #+cljs [cljs.core.match]
-            #+clj [clojure.core.match :refer (match)]))
+            #+clj [clojure.core.match :refer [match]]))
+
+#+cljs (enable-console-print!)
 
 ;; --------------------------------------------------------------------------------
 ;; 1 & 2 Make it work and make it right
@@ -77,7 +79,9 @@
 (extend-protocol PatternSegment
   #+clj String
   #+cljs string
-  (segment-regex-group [this] (format "\\Q%s\\E" this))
+  (segment-regex-group [this]
+    #+clj (str "\\Q" this "\\E")
+    #+cljs (.replace this #"/(\W)/g" "\\$1"))
   (param-key [_] nil)
   (transform-param [_] identity)
   (unmatch-segment [this _] {:path [this]})
@@ -96,19 +100,21 @@
   ;; The qualifier is usually a regex
   (segment-regex-group [this] (segment-regex-group (first this)))
   (param-key [this]
-    (let [k (second this)
-          ex-str "If a PatternSegment is represented by a vector, the second
-                   element must be the keyword associated with the pattern: "]
+    (let [k (second this)]
       (if (keyword? k)
         k
-        (throw (ex-info (str ex-str this) {})))))
+        (throw (ex-info (str "If a PatternSegment is represented by a vector, the second
+                              element must be the keyword associated with the pattern: "
+                             this)
+                        {})))))
   (transform-param [this] (transform-param (first this)))
   (unmatch-segment [this params]
-    (let [k (second this)
-          ex-str "If a PatternSegment is represented by a vector, the second element
-                   must be the key associated with the pattern: "]
+    (let [k (second this)]
       (if-not (keyword? k)
-        (throw (ex-info (str ex-str this) {})))
+        (throw (ex-info (str "If a PatternSegment is represented by a vector, the second element
+                              must be the key associated with the pattern: "
+                             this)
+                        {})))
       {:path [k]
        :params [[k
                  #(if-let [v (get params k)]
@@ -136,7 +142,7 @@
                                   {})))]]})
 
   #+clj clojure.lang.Fn
-  #+cljs cljs.core.IFn
+  #+cljs function
   (segment-regex-group [this]
     (condp = this
      keyword "[A-Za-z]+[A-Za-z0-9\\*\\+\\!\\-\\_\\?\\.]*(?:%2F[A-Za-z]+[A-Za-z0-9\\*\\+\\!\\-\\_\\?\\.]*)?"
@@ -188,7 +194,6 @@
     (merge (dissoc m :remainder) {:handler handler})))
 
 (extend-protocol Pattern
-
   #+clj String
   #+cljs string
   (match-pattern [this env]
@@ -302,7 +307,7 @@
   (unresolve-handler [this m] (when (= this (:handler m)) ""))
 
   #+clj clojure.lang.Fn
-  #+cljs cljs.core.IFn
+  #+cljs function
   (resolve-handler [this m] (succeed this m))
   (unresolve-handler [this m] (when (= this (:handler m)) "")))
 

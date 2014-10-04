@@ -10,11 +10,10 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns bidi.bidi-test
-  #+clj (:use clojure.test)
-  #+cljs (:use-macros [cemerick.cljs.test :only [is testing deftest]])
-  (:require [bidi.bidi :refer :all]
-            [ring.mock.request :refer :all]
-            #+cljs cemerick.cljs.test))
+  #+cljs (:require-macros [cemerick.cljs.test :refer [is testing deftest]])
+  (:require #+clj [clojure.test :refer :all]
+            #+cljs [cemerick.cljs.test :as t]
+            [bidi.bidi :as bidi :refer [match-route path-for route-params]]))
 
 (deftest matching-routes-test
   (testing "misc-routes"
@@ -35,6 +34,7 @@
                         "/blog/bar/abc")
            {:handler :bar}))
 
+    #+clj
     (is (= (match-route ["/blog" [["/foo" 'foo]
                                   [["/bar" [#".*" :path]] :bar]]]
                         "/blog/bar/articles/123/index.html")
@@ -56,6 +56,7 @@
                         "/blog/articles/123/index.html")
            {:handler 'foo :route-params {:id "123"}}))
 
+    #+clj
     (testing "regex"
       (is (= (match-route ["/blog" [[["/articles/" [#"\d+" :id] "/index.html"] 'foo]
                                     ["/text" 'bar]]]
@@ -65,6 +66,7 @@
                                     ["/text" 'bar]]]
                           "/blog/articles/123a/index.html")
              nil))
+
       (is (= (match-route ["/blog" [[["/articles/" [#"\d+" :id] [#"\p{Lower}+" :a] "/index.html"] 'foo]
                                     ["/text" 'bar]]]
                           "/blog/articles/123abc/index.html")
@@ -101,7 +103,8 @@
           "/blog/article/1239.html"))
       (is
        ;; If not all the parameters are specified we expect an error to be thrown
-       (thrown? clojure.lang.ExceptionInfo (path-for routes 'archive-handler :id 1239)
+       (thrown? #+clj clojure.lang.ExceptionInfo #+cljs cljs.core.ExceptionInfo
+                (path-for routes 'archive-handler :id 1239)
                 "/blog/archive/1239/section.html"))
       (is
        (= (path-for routes 'archive-handler :id 1239 :page "section")
@@ -126,14 +129,15 @@
         (is (= (path-for routes :new-article-handler :artid 10)
                "/blog/articles/10"))
         (is (= #{:artid} (route-params routes :new-article-handler)))))
+
+    #+clj
     (testing "unmatching with regexes"
       (let [routes
             ["/blog" [[["/articles/" [#"\d+" :id] [#"\p{Lower}+" :a] "/index.html"] 'foo]
                       ["/text" 'bar]]]]
         (is (= (path-for routes 'foo :id "123" :a "abc")
                "/blog/articles/123abc/index.html"))
-        (is (= #{:id :a} (route-params routes 'foo)))
-        ))))
+        (is (= #{:id :a} (route-params routes 'foo)))))))
 
 
 (deftest unmatching-routes-with-anonymous-fns-test
