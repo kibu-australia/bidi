@@ -9,15 +9,27 @@
 ;;
 ;; You must not remove this notice, or any other, from this software.
 
-(defproject bidi "1.10.6-SNAPSHOT"
+(defproject bidi "1.10.6-KIBU"
   :description "Bidirectional URI routing"
   :url "https://github.com/juxt/bidi"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.5.1"]
+  :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2202"]
-                 [org.clojure/core.match "0.2.1"]
+                 [com.cemerick/url "0.1.1"]
                  [ring/ring-core "1.2.1"]]
   :lein-release {:deploy-via :clojars}
+  :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store"]
   :profiles {:dev {:dependencies [[ring-mock "0.1.5"]
-                                  [compojure "1.1.6"]]}})
+                                  [compojure "1.1.6"]]
+                   :hooks [cljx.hooks]
+                   :plugins [[com.keminglabs/cljx "0.4.0"]
+                             [lein-cljsbuild "1.0.2"]
+                             [com.cemerick/clojurescript.test "0.3.1"]]
+                   :cljx {:builds [{:source-paths ["src/cljx"]
+                                    :output-path "target/classes"
+                                    :rules :clj}
+
+                                   {:source-paths ["src/cljx"]
+                                    :output-path "target/classes"
+                                    :rules :cljs}]}}})
