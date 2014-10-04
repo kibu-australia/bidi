@@ -10,9 +10,11 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns bidi.bidi-test
-  (:require [clojure.test :refer :all]
-            [bidi.bidi :refer :all]
-            [ring.mock.request :refer :all]))
+  #+clj (:use clojure.test)
+  #+cljs (:use-macros [cemerick.cljs.test :only [is testing deftest]])
+  (:require [bidi.bidi :refer :all]
+            [ring.mock.request :refer :all]
+            #+cljs cemerick.cljs.test))
 
 (deftest matching-routes-test
   (testing "misc-routes"
