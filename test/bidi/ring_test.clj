@@ -115,44 +115,6 @@
     (is (= (path-for routes :bar :id "123") "/bar/123"))
     (is (= #{:id} (route-params routes :bar)))))
 
-(deftest keywords
-  (let [routes ["/" [["foo/" :x]
-                     [["foo/" [keyword :id]] :y]
-                     [["foo/" [keyword :id] "/bar"] :z]]]]
-    (is (= (:handler (match-route routes "/foo/")) :x))
-    (is (= #{} (route-params routes :x)))
-
-    (is (= (:handler (match-route routes "/foo/abc")) :y))
-    (is (= (:route-params (match-route routes "/foo/abc")) {:id :abc}))
-    (is (= (:route-params (match-route routes "/foo/abc%2Fdef")) {:id :abc/def}))
-    (is (= (path-for routes :y :id :abc) "/foo/abc"))
-    (is (= (path-for routes :y :id :abc/def) "/foo/abc%2Fdef"))
-    (is (= #{:id} (route-params routes :y)))
-
-    (is (= (:handler (match-route routes "/foo/abc/bar")) :z))
-    (is (= (path-for routes :z :id :abc) "/foo/abc/bar"))
-    (is (= #{:id} (route-params routes :z)))))
-
-(deftest long-test
-  (let [routes ["/" [["foo/" :x]
-                     [["foo/" [long :id]] :y]
-                     [["foo/" [long :id] "/bar"] :z]]]]
-    (is (= (:handler (match-route routes "/foo/")) :x))
-    (is (= #{} (route-params routes :x)))
-
-    (is (= (:handler (match-route routes "/foo/345")) :y))
-    (is (= (:route-params (match-route routes "/foo/345")) {:id 345}))
-    (is (= (path-for routes :y :id -1000) "/foo/-1000"))
-    (is (= (path-for routes :y :id 1234567) "/foo/1234567"))
-    (is (= #{:id} (route-params routes :y)))
-
-    (is (= (:handler (match-route routes "/foo/0/bar")) :z))
-    (is (= (path-for routes :z :id 12) "/foo/12/bar"))
-    (is (= #{:id} (route-params routes :z)))
-
-    (testing "bigger than longs"
-      (is (nil? (match-route routes "/foo/1012301231111111111111111111"))))))
-
 (deftest route-params-hygiene-test
   (let [handler
         (make-handler [["/blog/user/" :userid "/article"]

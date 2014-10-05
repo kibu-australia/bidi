@@ -16,8 +16,6 @@
             #+cljs [cljs.core.match]
             #+clj [clojure.core.match :refer [match]]))
 
-#+cljs (enable-console-print!)
-
 ;; --------------------------------------------------------------------------------
 ;; 1 & 2 Make it work and make it right
 ;; http://c2.com/cgi/wiki?MakeItWorkMakeItRightMakeItFast
@@ -157,7 +155,7 @@
   (matches? [this s]
     (condp = this
       keyword (keyword? s)
-      long #+clj (isa? (class s) java.lang.Number) #+cljs (true? (js/Number s)))))
+      long #+clj (isa? (class s) java.lang.Number) #+cljs (not (js/isNaN (js/Number s))))))
 
 ;; A Route is a pair. The pair has two halves: a pattern on the left,
 ;; while the right contains the result if the pattern matches.
