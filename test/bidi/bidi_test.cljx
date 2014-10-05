@@ -34,7 +34,6 @@
                         "/blog/bar/abc")
            {:handler :bar}))
 
-    #+clj
     (is (= (match-route ["/blog" [["/foo" 'foo]
                                   [["/bar" [#".*" :path]] :bar]]]
                         "/blog/bar/articles/123/index.html")
@@ -56,7 +55,6 @@
                         "/blog/articles/123/index.html")
            {:handler 'foo :route-params {:id "123"}}))
 
-    #+clj
     (testing "regex"
       (is (= (match-route ["/blog" [[["/articles/" [#"\d+" :id] "/index.html"] 'foo]
                                     ["/text" 'bar]]]
@@ -72,6 +70,7 @@
                           "/blog/articles/123abc/index.html")
              {:handler 'foo :route-params {:id "123" :a "abc"}}))
 
+      #+clj
       (is (= (match-route [#"/bl\p{Lower}{2}+" [[["/articles/" [#"\d+" :id] [#"\p{Lower}+" :a] "/index.html"] 'foo]
                                                 ["/text" 'bar]]]
                           "/blog/articles/123abc/index.html")
@@ -130,7 +129,6 @@
                "/blog/articles/10"))
         (is (= #{:artid} (route-params routes :new-article-handler)))))
 
-    #+clj
     (testing "unmatching with regexes"
       (let [routes
             ["/blog" [[["/articles/" [#"\d+" :id] [#"\p{Lower}+" :a] "/index.html"] 'foo]

@@ -86,7 +86,9 @@
 
   #+clj java.util.regex.Pattern
   #+cljs js/RegExp
-  (segment-regex-group [this] (.pattern this))
+  (segment-regex-group [this]
+    #+clj (.pattern this)
+    #+cljs (str this))
   (param-key [_] nil)
   (transform-param [_] identity)
   (matches? [this s] (re-matches this (str s)))
