@@ -273,16 +273,11 @@
   (unresolve-handler [this m] (some #(unmatch-pair % m) this))
 
   #+clj clojure.lang.PersistentList
-  #+cljs cljs.core.PersistentList
+  #+cljs cljs.core.List
   (resolve-handler [this m] (some #(match-pair % m) this))
   (unresolve-handler [this m] (some #(unmatch-pair % m) this))
 
   #+clj clojure.lang.APersistentMap
-  #+cljs cljs.core.PersistentArrayMap
-  (resolve-handler [this m] (some #(match-pair % m) this))
-  (unresolve-handler [this m] (some #(unmatch-pair % m) this))
-
-  #+clj clojure.lang.PersistentHashMap
   #+cljs cljs.core.PersistentArrayMap
   (resolve-handler [this m] (some #(match-pair % m) this))
   (unresolve-handler [this m] (some #(unmatch-pair % m) this))
