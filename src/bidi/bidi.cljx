@@ -338,8 +338,7 @@
                          (f)
                          token))) path)))
 
-(comment
-  (defn path-with-query-for
+(defn path-with-query-for
   "Like path-for, but extra parameters will be appended to the url as query parameters
   rather than silently ignored"
   [route handler & {:as all-params}]
@@ -350,7 +349,7 @@
                                   token))) path)
         query-params (not-empty (into (sorted-map) (apply dissoc all-params (keys params))))]
     (apply str path (when query-params
-                      ["?" (form-encode query-params)])))))
+                      ["?" (form-encode query-params)]))))
 
 ;; --------------------------------------------------------------------------------
 ;; 3. Make it fast
