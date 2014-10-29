@@ -13,7 +13,10 @@
   #+cljs (:require-macros [cemerick.cljs.test :refer [is testing deftest]])
   (:require #+clj [clojure.test :refer :all]
             #+cljs [cemerick.cljs.test :as t]
-            [bidi.bidi :as bidi :refer [match-route path-for route-params]]))
+            [bidi.bidi :as bidi :refer [match-route
+                                        path-for
+                                        path-with-query-for
+                                        route-params]]))
 
 (deftest matching-routes-test
   (testing "misc-routes"
@@ -149,16 +152,15 @@
       (is (= (path-for routes :temp-html)
              "/blog/temp.html")))))
 
-(comment
-  (deftest path-with-query-for-test
-    (let [routes [["/blog/user/" :userid "/article"] :index]]
+(deftest path-with-query-for-test
+  (let [routes [["/blog/user/" :userid "/article"] :index]]
 
-      (is (= (path-with-query-for routes :index :userid 123)
-             "/blog/user/123/article"))
-      (is (= (path-with-query-for routes :index :userid 123 :page 1)
-             "/blog/user/123/article?page=1"))
-      (is (= (path-with-query-for routes :index :userid 123 :page 1 :foo "bar")
-             "/blog/user/123/article?foo=bar&page=1")))))
+    (is (= (path-with-query-for routes :index :userid 123)
+           "/blog/user/123/article"))
+    (is (= (path-with-query-for routes :index :userid 123 :page 1)
+           "/blog/user/123/article?page=1"))
+    (is (= (path-with-query-for routes :index :userid 123 :page 1 :foo "bar")
+           "/blog/user/123/article?foo=bar&page=1"))))
 
 (deftest keywords
   (let [routes ["/" [["foo/" :x]

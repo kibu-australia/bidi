@@ -338,6 +338,34 @@
                          (f)
                          token))) path)))
 
+;; cljx version of ring.util.codec FormEncodeable protocol
+;; Difference is it accepts no custom encoding and uses UTF-8
+;; This is required for `path-with-query-for` function
+(defprotocol FormEncodeable
+  (form-encode [x]))
+
+(extend-protocol FormEncodeable
+  #+clj String
+  #+cljs string
+  (form-encode [unencoded] (url-encode unencoded))
+
+  #+clj clojure.lang.APersistentMap
+  #+cljs cljs.core.PersistentArrayMap
+  (form-encode [params]
+    (letfn [(encode [x] (form-encode x))
+            (encode-param [[k v]] (str (encode (name k)) "=" (encode v)))]
+      (->> params
+           (mapcat
+            (fn [[k v]]
+              (if (or (seq? v) (sequential? v) )
+                (map #(encode-param [k %]) v)
+                [(encode-param [k v])])))
+           (clojure.string/join "&"))))
+
+  #+clj Object
+  #+cljs default
+  (form-encode [x] (form-encode (str x))))
+
 (defn path-with-query-for
   "Like path-for, but extra parameters will be appended to the url as query parameters
   rather than silently ignored"
