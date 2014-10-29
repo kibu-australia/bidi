@@ -9,14 +9,14 @@
 ;;
 ;; You must not remove this notice, or any other, from this software.
 
-(defproject kibu/bidi "1.10.61"
+(defproject bidi "1.10.61"
   :description "Bidirectional URI routing"
   :url "https://github.com/juxt/bidi"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2356"]
+                 [org.clojure/clojurescript "0.0-2371"]
                  [org.clojure/core.match "0.2.1"]
                  [com.cemerick/url "0.1.1"]
                  [ring/ring-core "1.2.1"]]
@@ -67,4 +67,4 @@
                                      "target/generated/src/cljs"
                                      "target/generated/test/cljs"]
                       :compiler {:output-to "target/unit-test.js"
-                                 :optimizations :advanced}}}})
+                                 :optimizations :whitespace}}}})
