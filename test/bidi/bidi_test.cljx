@@ -14,6 +14,7 @@
   (:require #+clj [clojure.test :refer :all]
             #+cljs [cemerick.cljs.test :as t]
             [bidi.bidi :as bidi :refer [match-route
+                                        match-route-with-query
                                         path-for
                                         path-with-query-for
                                         route-params]]))
@@ -85,7 +86,22 @@
 
     (testing "boolean patterns"
       (is (= (match-route [true :index] "/any") {:handler :index}))
-      (is (= (match-route [false :index] "/any") nil)))))
+      (is (= (match-route [false :index] "/any") nil)))
+    
+    (testing "query params"
+      (is (= (match-route-with-query ["/blog/articles" :index]
+                                     "/blog/articles")
+             {:handler :index :query-params {}}))
+      (is (= (match-route-with-query ["/blog/articles" :index]
+                                     "/blog/articles?foo=bar")
+             {:handler :index :query-params {:foo "bar"}}))
+      (is (= (match-route-with-query ["/blog/articles" :index]
+                                     "/blog/articles?foo=bar&baz=42")
+             {:handler :index :query-params {:foo "bar" :baz "42"}}))
+      (is (= (match-route-with-query ["/blog" [["/index.html" 'index]
+                                               [["/bar/articles/" :artid "/index.html"] 'article]]]
+                                     "/blog/bar/articles/123/index.html?foo=bar&baz=42")
+             {:handler 'article :route-params {:artid "123"} :query-params {:foo "bar" :baz "42"}})))))
 
 (deftest unmatching-routes-test
   (let [routes ["/"
@@ -199,3 +215,5 @@
 
     (testing "bigger than longs"
       (is (nil? (match-route routes "/foo/1012301231111111111111111111"))))))
+
+(deftest query-params)

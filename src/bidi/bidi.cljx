@@ -313,6 +313,21 @@
   (-> (match-pair route (merge options {:remainder path :route route}))
       (dissoc :route)))
 
+(defn query-string->params [q]
+  (->> (clojure.string/split q #"&") 
+       (map #(clojure.string/split % #"="))
+       (map (fn [[k v]] [(keyword k) v]))
+       (into {})))
+
+(defn match-route-with-query
+  "Like match-route, but doesn't ignore query params."
+  [route path & {:as options}]
+  (let [[path query] (clojure.string/split path #"\?")
+        query-params (query-string->params query)]
+    (-> (match-pair route (merge options {:remainder path :route route}))
+        (dissoc :route)
+        (assoc :query-params query-params))))
+
 (defn- path-and-params
   [route handler params]
   (when (nil? handler)
